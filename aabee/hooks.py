@@ -48,6 +48,11 @@ app_license = "mit"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+doctype_js = {
+    "Lead": "public/js/lead.js"
+}
+
+
 # Svg Icons
 # ------------------
 # include app icons in desk
@@ -144,6 +149,10 @@ app_license = "mit"
 # 		"on_trash": "method"
 # 	}
 # }
+
+doc_events = {
+  
+}
 
 # Scheduled Tasks
 # ---------------
