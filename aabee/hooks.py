@@ -157,6 +157,11 @@ doctype_js = {
 # 	}
 # }
 
+app_include_routes = [
+    {"methods": ["POST"], "path": "/api/method/aabee.telecmi.telecmi.incoming", "handler": "aabee.telecmi.telecmi.incoming"},
+]
+
+
 
 scheduler_events = {
     "cron": {

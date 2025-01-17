@@ -97,18 +97,18 @@ def initiate_full_process():
 
 
 
-@frappe.whitelist()
-def get_telecmi_settings():
-    user_id = "1234_33334993"
-    password = "123456"
-    display_name = "Test"
-    uri = "sbcind.telecmi.com"
-    return {
-        'user_id': user_id,
-        'password': password,
-        'sbc_uri': uri,
-        'display_name': display_name
-    }
+# @frappe.whitelist()
+# def get_telecmi_settings():
+#     user_id = "1234_33334993"
+#     password = "123456"
+#     display_name = "Test"
+#     uri = "sbcind.telecmi.com"
+#     return {
+#         'user_id': user_id,
+#         'password': password,
+#         'sbc_uri': uri,
+#         'display_name': display_name
+#     }
 
 
 
@@ -198,3 +198,40 @@ def fetch_and_store_call_records(method=None, *args, **kwargs):
         frappe.throw(f"Error connecting to TeleCMI API: {str(e)}")
     except ValueError as e:
         frappe.throw(f"Error processing API response: {str(e)}")
+
+
+
+@frappe.whitelist(allow_guest=True)
+def incoming():
+    try:
+        data = frappe.request.get_json()
+        if not data:
+            return {"code": 400, "message": "Invalid or missing payload"}
+
+        from_number = data.get("from")
+        to_number = data.get("to")
+        cmiuuid = data.get("cmiuuid")
+        appid = data.get("appid")
+
+        to = to_number
+
+        response_body = {
+            "code": 200,
+            "loop": 2,
+            "followme": False,
+            "hangup": False,
+            "timeout": 20,
+            "welcome_music": "1609133greeting_music.wav",
+            "waiting_music": "16098620waiting_music.wav",
+            "result": [
+                {
+                    "agent_id": "1234_33334993",
+                    "phone": to_number,
+                }
+            ]
+        }
+        return response_body
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "TeleCMI Process Call Flow")
+        return {"code": 500, "message": str(e)}
