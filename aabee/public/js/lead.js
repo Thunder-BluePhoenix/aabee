@@ -45,3 +45,37 @@ frappe.ui.form.on('Lead', {
 //         }
 //     }
 // });
+
+
+
+// frappe.ui.form.on('Lead', {
+//     refresh: function(frm) {
+//         // Create container for TeleCMI iframe if it doesn't exist
+//         if (!document.getElementById('telecmi-container')) {
+//             const container = document.createElement('div');
+//             container.id = 'telecmi-container';
+//             container.style.cssText = `
+//                 position: fixed;
+//                 bottom: 20px;
+//                 right: 20px;
+//                 z-index: 1000;
+//                 width: 300px;
+//                 height: 500px;
+//             `;
+            
+//             // Create the iframe
+//             const iframe = document.createElement('iframe');
+//             iframe.src = 'https://iframe.telecmi.com/hubspot/'; // Replace with your actual TeleCMI URL
+//             iframe.style.cssText = `
+//                 width: 100%;
+//                 height: 100%;
+//                 border: none;
+//                 border-radius: 8px;
+//                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+//             `;
+            
+//             container.appendChild(iframe);
+//             document.body.appendChild(container);
+//         }
+//     }
+// });
