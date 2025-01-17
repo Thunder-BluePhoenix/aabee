@@ -48,6 +48,13 @@ app_license = "mit"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+app_include_js = [
+    "https://cdn.jsdelivr.net/npm/piopiyjs/dist/piopiy.min.js",
+    "/assets/aabee/js/telecmi.js",
+    "/assets/aabee/js/lead.js",
+
+]
+
 doctype_js = {
     "Lead": "public/js/lead.js"
 }
@@ -150,9 +157,20 @@ doctype_js = {
 # 	}
 # }
 
+
+scheduler_events = {
+    "cron": {
+        "*/5 * * * *": [
+            "aabee.telecmi.telecmi.fetch_and_store_call_records"
+        ]
+    }
+}
+
 doc_events = {
+   
   
 }
+
 
 # Scheduled Tasks
 # ---------------
