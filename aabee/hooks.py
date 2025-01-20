@@ -159,17 +159,18 @@ doctype_js = {
 
 app_include_routes = [
     {"methods": ["POST"], "path": "/api/method/aabee.telecmi.telecmi.incoming", "handler": "aabee.telecmi.telecmi.incoming"},
+    {"methods": ["POST"], "path": "/api/method/aabee.telecmi.telecmi.call_records", "handler": "aabee.telecmi.telecmi.call_records"},
 ]
 
 
 
-scheduler_events = {
-    "cron": {
-        "*/5 * * * *": [
-            "aabee.telecmi.telecmi.fetch_and_store_call_records"
-        ]
-    }
-}
+# scheduler_events = {
+#     "cron": {
+#         "*/5 * * * *": [
+#             "aabee.telecmi.telecmi.fetch_and_store_call_records"
+#         ]
+#     }
+# }
 
 doc_events = {
    
