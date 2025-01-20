@@ -312,21 +312,178 @@ def fetch_and_store_call_records(method=None, *args, **kwargs):
 
 
 
+# @frappe.whitelist(allow_guest=True)
+# def incoming():
+#     try:
+#         # Get and validate JSON data
+#         data = frappe.request.get_json()
+#         if not data:
+#             return {"code": 400, "message": "Invalid or missing payload"}
+#         print(data)
+
+#         # Extract request parameters
+#         from_number = data.get("from")
+#         to_number = data.get("to")
+#         cmiuuid = data.get("cmiuuid")
+#         appid = data.get("appid")
+
+#         # Default values for telecmi configuration
+#         default_config = {
+#             "telecmi_id": "1234_33334993",
+#             "telecmi_password": "123456",
+#             "followme": True,
+#             "agent_number": "918670972005"
+#         }
+
+#         # Initialize telecmi configuration with defaults
+#         telecmi_config = default_config.copy()
+
+#         # Try to find customer and their assigned employee if from_number exists
+#         if from_number:
+#             try:
+#                 customer = frappe.get_doc("Customer", {"custom_primary_mobile_no": from_number})
+#                 if customer and customer.custom_assign_to:
+#                     employee = frappe.get_doc("Employee", {"name": customer.custom_assign_to})
+#                     if employee:
+#                         telecmi_config.update({
+#                             "telecmi_id": employee.custom_telecmi_id,
+#                             "telecmi_password": employee.custom_telecmi_password,
+#                             "followme": employee.custom_follow_me_,
+#                             "agent_number": employee.custom_telecmi_mobile_number
+#                         })
+#             except frappe.DoesNotExistError:
+#                 # If customer not found, use default config (already set)
+#                 pass
+
+#         # Prepare response
+#         response_body = {
+#             "code": 200,
+#             "loop": 2,
+#             "followme": True if telecmi_config["followme"] else False,
+#             "hangup": False,
+#             "timeout": 20,
+#             # "welcome_music": "1609133greeting_music.wav",
+#             # "waiting_music": "16098620waiting_music.wav",
+#             "result": [
+#                 {
+#                     "agent_id": telecmi_config["telecmi_id"],
+#                     "phone": telecmi_config["agent_number"],
+#                 }
+#             ]
+#         }
+#         print(response_body)
+#         return response_body
+
+#     except Exception as e:
+#         frappe.log_error(f"Telecmi Webhook Error: {str(e)}", "Telecmi Webhook")
+#         return {
+#             "code": 500,
+#             # "message": "Internal server error",
+#             "error": str(e)
+#         }
+
+
+
+# @frappe.whitelist(allow_guest=True)
+# def incoming():
+#     try:
+#         # Get and validate JSON data
+#         data = frappe.request.get_json()
+#         if not data:
+#             return {"code": 400, "message": "Invalid or missing payload"}
+        
+#         # Extract request parameters
+#         from_number = data.get("from")
+#         to_number = data.get("to")
+#         cmiuuid = data.get("cmiuuid")
+#         appid = data.get("appid")
+
+#         # Default values for telecmi configuration
+#         default_config = {
+#             "telecmi_id": "1234_33334993",
+#             "telecmi_password": "123456",
+#             "followme": True,
+#             "agent_number": "918670972005"
+#         }
+
+#         # Initialize telecmi configuration with defaults
+#         telecmi_config = default_config.copy()
+
+#         # Try to find customer and their assigned employee if from_number exists
+#         if from_number:
+#             try:
+#                 customer = frappe.get_doc("Customer", {"custom_primary_mobile_no": from_number})
+#                 if customer and customer.custom_assign_to:
+#                     employee = frappe.get_doc("Employee", {"name": customer.custom_assign_to})
+#                     if employee:
+#                         telecmi_config.update({
+#                             "telecmi_id": employee.custom_telecmi_id,
+#                             "telecmi_password": employee.custom_telecmi_password,
+#                             "followme": employee.custom_follow_me_,
+#                             "agent_number": employee.custom_telecmi_mobile_number
+#                         })
+#             except frappe.DoesNotExistError:
+#                 # If customer not found, use default config (already set)
+#                 pass
+
+#         # Prepare response
+#         response_body = {
+#             "code": 200,
+#             "loop": 2,
+#             "followme": True if telecmi_config["followme"] else False,
+#             "hangup": False,
+#             "timeout": 20,
+#             # "welcome_music": "1609133greeting_music.wav",
+#             # "waiting_music": "16098620waiting_music.wav",
+#             "result": [
+#                 {
+#                     "agent_id": telecmi_config["telecmi_id"],
+#                     "phone": telecmi_config["agent_number"],
+#                 }
+#             ]
+#         }
+#         return response_body
+
+#     except Exception as e:
+#         # Log the error internally without exposing it to the client
+#         frappe.log_error(f"Telecmi Webhook Error: {str(e)}", "Telecmi Webhook")
+#         return {
+#             "code": 500,
+#             "message": "Internal server error"
+#         }
+
+
+from frappe.handler import Response
+import json
+
 @frappe.whitelist(allow_guest=True)
 def incoming():
     try:
         # Get and validate JSON data
-        data = frappe.request.get_json()
+        data = frappe.request.form
         if not data:
-            return {"code": 400, "message": "Invalid or missing payload"}
-        print(data)
-
+            response_data = {
+                "code": 400,
+                "loop": 0,
+                "followme": False,
+                "hangup": True,
+                "timeout": 0,
+                "result": []
+            }
+            frappe.response.update(response_data)
+            return Response(
+                response=json.dumps(response_data),
+                status=200,
+                mimetype='application/json'
+            )
+        
         # Extract request parameters
         from_number = data.get("from")
-        to_number = data.get("to")
-        cmiuuid = data.get("cmiuuid")
+        print(from_number,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
+        # to_number = data.get("to")
+        # cmiuuid = data.get("cmiuuid")
         appid = data.get("appid")
-
+        
         # Default values for telecmi configuration
         default_config = {
             "telecmi_id": "1234_33334993",
@@ -334,10 +491,10 @@ def incoming():
             "followme": True,
             "agent_number": "918670972005"
         }
-
+        
         # Initialize telecmi configuration with defaults
         telecmi_config = default_config.copy()
-
+        
         # Try to find customer and their assigned employee if from_number exists
         if from_number:
             try:
@@ -352,18 +509,17 @@ def incoming():
                             "agent_number": employee.custom_telecmi_mobile_number
                         })
             except frappe.DoesNotExistError:
-                # If customer not found, use default config (already set)
                 pass
-
+        
         # Prepare response
-        response_body = {
+        response_data = {
             "code": 200,
             "loop": 2,
             "followme": True if telecmi_config["followme"] else False,
             "hangup": False,
             "timeout": 20,
-            "welcome_music": "1609133greeting_music.wav",
-            "waiting_music": "16098620waiting_music.wav",
+            "welcome_music": "cmiteamgreeting.wav",
+            "waiting_music": "cmiwaiting.wav",
             "result": [
                 {
                     "agent_id": telecmi_config["telecmi_id"],
@@ -371,20 +527,32 @@ def incoming():
                 }
             ]
         }
-        print(response_body)
-        return response_body
-
+        
+        # Update frappe response and return custom Response object
+        frappe.response.update(response_data)
+        return Response(
+            response=json.dumps(response_data),
+            status=200,
+            mimetype='application/json'
+        )
+    
     except Exception as e:
+        # Log the error internally
         frappe.log_error(f"Telecmi Webhook Error: {str(e)}", "Telecmi Webhook")
-        return {
+        error_response = {
             "code": 500,
-            "message": "Internal server error",
-            "error": str(e)
+            "loop": 0,
+            "followme": False,
+            "hangup": True,
+            "timeout": 0,
+            "result": []
         }
-
-
-
-
+        frappe.response.update(error_response)
+        return Response(
+            response=json.dumps(error_response),
+            status=200,
+            mimetype='application/json'
+        )
 
 # @frappe.whitelist(allow_guest=True)
 # def call_records():
@@ -409,6 +577,8 @@ def call_records():
     try:
       
         data = frappe.request.get_json()
+        print("/n/n/n/n")
+        print("lllllllllllllllllllllllllllllllllllllll")
         print(data)
 
         
