@@ -7,9 +7,9 @@ frappe.ui.form.on('Lead', {
             }
             frappe.call({
                 method: 'aabee.telecmi.telecmi.initiate_full_process',
-                args: {
-                    number: frm.doc.mobile_no
-                },
+                // args: {
+                //     number: frm.doc.mobile_no
+                // },
                 callback: function(response) {
                     if (response.message) {
                         frappe.msgprint('Call initiated successfully!');

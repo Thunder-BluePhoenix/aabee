@@ -6,22 +6,23 @@ import requests
 import os
 
 @frappe.whitelist()
-def initiate_full_process(number=None, **kwargs):
+def initiate_full_process():
+    # number=None, **kwargs
     
-    if not number:
-        return {"status": "error", "message": "Monile Number is required"}
+    # if not number:
+    #     return {"status": "error", "message": "Monile Number is required"}
    
     user_id = "1234_33334993"
     password = "123456"
     app_id = 33334993
     app_secret = "b6cadca2-f98f-4f2e-bef9-883656825298"
-    # to_number = 917827833775
-    to_number = number
-    print(type(to_number),"to_number")
-    to_number= int(to_number)
-    print(type(to_number),"to_number")
+    to_number = 917559302314
+    # to_number = number
+    # print(type(to_number),"to_number")
+    # to_number= int(to_number)
+    # print(type(to_number),"to_number")
     caller_id = 911203203903
-    print(type(caller_id),"caller_id")
+    # print(type(caller_id),"caller_id")
 
     user_token_url = "https://rest.telecmi.com/v2/user/login"
     user_payload = {
