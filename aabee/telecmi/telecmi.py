@@ -6,7 +6,7 @@ import requests
 import os
 
 @frappe.whitelist()
-def initiate_full_process(number):
+def initiate_full_process(number=None, **kwargs):
     
     if not number:
         return {"status": "error", "message": "Monile Number is required"}
