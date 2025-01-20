@@ -1,8 +1,15 @@
 frappe.ui.form.on('Lead', {
     refresh: function(frm) {
         frm.add_custom_button('Call Customer', function() {
+            if (!frm.doc.mobile_no) {
+                frappe.msgprint('Please enter a Mobile Number first.');
+                return;
+            }
             frappe.call({
                 method: 'aabee.telecmi.telecmi.initiate_full_process',
+                args: {
+                    number: frm.doc.mobile_no
+                },
                 callback: function(response) {
                     if (response.message) {
                         frappe.msgprint('Call initiated successfully!');

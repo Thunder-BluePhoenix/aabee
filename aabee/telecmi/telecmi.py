@@ -6,14 +6,22 @@ import requests
 import os
 
 @frappe.whitelist()
-def initiate_full_process():
+def initiate_full_process(number,**kwargs):
+    # number = kwargs.get("number")
+    if not number:
+        return {"status": "error", "message": "Monile Number is required"}
    
     user_id = "1234_33334993"
     password = "123456"
     app_id = 33334993
     app_secret = "b6cadca2-f98f-4f2e-bef9-883656825298"
-    to_number = 917559302314
+    # to_number = 917827833775
+    to_number = number
+    print(type(to_number),"to_number")
+    to_number= int(to_number)
+    print(type(to_number),"to_number")
     caller_id = 911203203903
+    print(type(caller_id),"caller_id")
 
     user_token_url = "https://rest.telecmi.com/v2/user/login"
     user_payload = {
@@ -577,8 +585,6 @@ def call_records():
     try:
       
         data = frappe.request.get_json()
-        print("/n/n/n/n")
-        print("lllllllllllllllllllllllllllllllllllllll")
         print(data)
 
         
@@ -641,12 +647,8 @@ def call_records():
 
                 frappe.db.commit()
                 print("File saved successfully")
-                # print(f"File size: {os.path.getsize(file_path)}")
-                # print(f"File URL created: {file_doc.file_url}")
-
-                # call_log_data["custom_recording_file"] = file_doc.file_url
-                # call_log_data.set("custom_recording_file", file_doc.file_url)
-                print(f"Value set in call_log_data: {call_log_data.get('custom_recording_file')}")
+                
+               
 
             except Exception as e:
                 frappe.log_error(f"Error saving file: {str(e)}", "Call Log File Save Error")
@@ -654,13 +656,10 @@ def call_records():
 
 
         try:
-            # print(f"Value before creating new doc: {call_log_data.get('custom_recording_file')}")
             call_log = frappe.get_doc(call_log_data)
-            print(f"Value in new doc: {call_log.custom_recording_file}")
-            # call_log.custom_recording_file = call_log_data.get("custom_recording_file") 
             call_log.insert(ignore_permissions=True)
             frappe.db.commit()
-            print(f"Final saved value: {call_log.custom_recording_file}")
+           
             print("Call record successfully logged")
         except Exception as e:
             frappe.log_error(f"Error saving call log: {str(e)}", "Call Log Save Error")
