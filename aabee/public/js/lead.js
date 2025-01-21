@@ -5,11 +5,14 @@ frappe.ui.form.on('Lead', {
                 frappe.msgprint('Please enter a Mobile Number first.');
                 return;
             }
+            let number = frm.doc.mobile_no;
             frappe.call({
                 method: 'aabee.telecmi.telecmi.initiate_full_process',
-                // args: {
-                //     number: frm.doc.mobile_no
-                // },
+                
+                freeze: true,
+                args: {
+                    number
+                },
                 callback: function(response) {
                     if (response.message) {
                         frappe.msgprint('Call initiated successfully!');
