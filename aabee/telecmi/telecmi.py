@@ -6,7 +6,7 @@ import requests
 import os
 
 @frappe.whitelist()
-def initiate_full_process():
+def initiate_full_process(number):
     # number=None, **kwargs
     
     # if not number:
@@ -16,11 +16,13 @@ def initiate_full_process():
     password = "123456"
     app_id = 33334993
     app_secret = "b6cadca2-f98f-4f2e-bef9-883656825298"
-    to_number = 917559302314
+    # to_number = 917559302314
     # to_number = number
     # print(type(to_number),"to_number")
     # to_number= int(to_number)
-    # print(type(to_number),"to_number")
+    print(type(number),"to_number")
+    number = int(number)
+    print(type(number),"to_number")
     caller_id = 911203203903
     # print(type(caller_id),"caller_id")
 
@@ -73,7 +75,7 @@ def initiate_full_process():
     click_to_call_url = "https://rest.telecmi.com/v2/ind/click2call"
     click_to_call_payload = {
         "token": user_token,
-        "to": to_number,
+        "to": number,
         "extra_params": {"crm": "true"},
         "callerid": caller_id
     }
