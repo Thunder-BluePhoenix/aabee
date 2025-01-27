@@ -582,40 +582,128 @@ def incoming():
 #         }
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 
+# def call_records():
+#     try:
+      
+#         data = frappe.request.get_json()
+#         print(data)
+
+        
+#         if not data.get('call_id') or not data.get('status'):
+#             return {
+#                 "code": 400,
+#                 "message": "Missing required fields in the payload"
+#             }
+
+#         call_log_data = frappe.get_doc({
+#             "doctype": "Call Log",  
+#             "from": str(data.get('virtual_number')),
+#             "id": data.get('call_id'),
+#             "type": "Outgoing",
+#             "to": str(data.get('to')),
+#             # "cmiuuid": data.get('cmiuuid'),
+#             # "status": data.get('status').capitalize() if data.get('status') else None,
+#             "status": "In Progress",
+#             # "user": data.get('user'),
+#             # "duration": data.get('time'),
+#             # "direction": data.get('direction'),
+#             "duration": data.get('answeredsec'),
+#             # "hangup_reason": data.get('hangup_reason'),
+#             # "request_id": data.get('request_id'),
+#             # "extra_params": frappe.as_json(data.get('extra_params')),  
+#         })
+        
+      
+
+#         if "filename" in data and data["filename"]:
+#             try:
+#                 file_name = data["filename"]
+#                 app_id = data["appid"]
+#                 file_path = os.path.join(frappe.utils.get_site_path("public", "files"), file_name)
+
+#                 remote_file_url = f"https://app.telecmi.com/download_music/{file_name}?inet_no={app_id}" 
+#                 print(remote_file_url) 
+#                 # call_log_data["recording_url"] = remote_file_url
+#                 call_log_data.set("recording_url", remote_file_url)
+                
+
+                
+#                 # response = requests.get(remote_file_url, stream=True)
+#                 # if response.status_code == 200:
+#                 #     with open(file_path, "wb") as file:
+#                 #         for chunk in response.iter_content(chunk_size=8192):
+#                 #             file.write(chunk)
+#                 #     print(f"File downloaded successfully: {file_path}")
+#                 # else:
+#                 #     raise Exception(f"Failed to download file. HTTP Status Code: {response.status_code}")
+
+                
+#                 # file_doc = frappe.get_doc({
+#                 #     "doctype": "File",
+#                 #     "file_url": f"/files/{file_name}",  
+#                 #     "attached_to_doctype": "Call Log",
+#                 #     "attached_to_name": data.get('call_id'),
+#                 # })
+#                 # file_doc.insert(ignore_permissions=True)
+
+#                 frappe.db.commit()
+#                 print("File saved successfully")
+                
+               
+
+#             except Exception as e:
+#                 frappe.log_error(f"Error saving file: {str(e)}", "Call Log File Save Error")
+#                 print(f"Error saving file: {str(e)}")
+
+
+#         try:
+#             call_log = frappe.get_doc(call_log_data)
+#             call_log.insert(ignore_permissions=True)
+#             frappe.db.commit()
+           
+#             print("Call record successfully logged")
+#         except Exception as e:
+#             frappe.log_error(f"Error saving call log: {str(e)}", "Call Log Save Error")
+#             print(f"Error saving call log: {str(e)}")
+
+
+#             return {
+#                     "code": 200,
+#                     "message": "Call record successfully logged"
+#                 }
+
+#     except Exception as e:
+#         frappe.log_error(f"TeleCMI Webhook Error: {str(e)}", "TeleCMI Webhook")
+#         return {
+#             "code": 500,
+#             "message": "Internal server error",
+#             "error": str(e)
+#         }
+
+
+@frappe.whitelist(allow_guest=True)
 def call_records():
     try:
-      
         data = frappe.request.get_json()
         print(data)
 
-        
-        if not data.get('call_id') or not data.get('status'):
+        if data.get("direction") == "outbound" and data.get("leg") != "b":
             return {
-                "code": 400,
-                "message": "Missing required fields in the payload"
+                "code": 200,
+                "message": "Skipping record: Only storing outbound calls with leg 'b'"
             }
 
         call_log_data = frappe.get_doc({
-            "doctype": "Call Log",  
-            "from": str(data.get('virtual_number')),
-            "id": data.get('call_id'),
-            "type": "Outgoing",
-            "to": str(data.get('to')),
-            # "cmiuuid": data.get('cmiuuid'),
-            # "status": data.get('status').capitalize() if data.get('status') else None,
-            "status": "In Progress",
-            # "user": data.get('user'),
-            # "duration": data.get('time'),
-            # "direction": data.get('direction'),
-            "duration": data.get('answeredsec'),
-            # "hangup_reason": data.get('hangup_reason'),
-            # "request_id": data.get('request_id'),
-            # "extra_params": frappe.as_json(data.get('extra_params')),  
+            "doctype": "Call Log",
+            "from": str(data.get("from")) if data.get("direction") == "inbound" else str(data.get("virtual_number")),
+            "id": data.get("cmiuuid"),  
+            "type": "Outgoing" if data.get("direction") == "outbound" else "Incoming",
+            "to": str(data.get("to")),
+            "status": "Completed" if data.get("status") == "answered" else "No Answer",  
+            "duration": data.get("answeredsec"),
         })
-        
-      
 
         if "filename" in data and data["filename"]:
             try:
@@ -623,62 +711,42 @@ def call_records():
                 app_id = data["appid"]
                 file_path = os.path.join(frappe.utils.get_site_path("public", "files"), file_name)
 
-                remote_file_url = f"https://app.telecmi.com/download_music/{file_name}?inet_no={app_id}" 
-                print(remote_file_url) 
-                # call_log_data["recording_url"] = remote_file_url
+                remote_file_url = f"https://app.telecmi.com/download_music/{file_name}?inet_no={app_id}"
+                print(remote_file_url)
                 call_log_data.set("recording_url", remote_file_url)
-                
-
-                
-                # response = requests.get(remote_file_url, stream=True)
-                # if response.status_code == 200:
-                #     with open(file_path, "wb") as file:
-                #         for chunk in response.iter_content(chunk_size=8192):
-                #             file.write(chunk)
-                #     print(f"File downloaded successfully: {file_path}")
-                # else:
-                #     raise Exception(f"Failed to download file. HTTP Status Code: {response.status_code}")
-
-                
-                # file_doc = frappe.get_doc({
-                #     "doctype": "File",
-                #     "file_url": f"/files/{file_name}",  
-                #     "attached_to_doctype": "Call Log",
-                #     "attached_to_name": data.get('call_id'),
-                # })
-                # file_doc.insert(ignore_permissions=True)
 
                 frappe.db.commit()
-                print("File saved successfully")
-                
-               
+                print("File URL set successfully")
 
             except Exception as e:
                 frappe.log_error(f"Error saving file: {str(e)}", "Call Log File Save Error")
                 print(f"Error saving file: {str(e)}")
 
-
+       
         try:
             call_log = frappe.get_doc(call_log_data)
             call_log.insert(ignore_permissions=True)
             frappe.db.commit()
-           
             print("Call record successfully logged")
+            return {
+                "code": 200,
+                "message": "Call record successfully logged"
+            }
+
         except Exception as e:
             frappe.log_error(f"Error saving call log: {str(e)}", "Call Log Save Error")
             print(f"Error saving call log: {str(e)}")
-
-
             return {
-                    "code": 200,
-                    "message": "Call record successfully logged"
-                }
+                "code": 500,
+                "message": "Error saving call log",
+                "error": str(e),
+            }
 
     except Exception as e:
         frappe.log_error(f"TeleCMI Webhook Error: {str(e)}", "TeleCMI Webhook")
         return {
             "code": 500,
             "message": "Internal server error",
-            "error": str(e)
+            "error": str(e),
         }
 
