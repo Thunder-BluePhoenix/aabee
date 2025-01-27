@@ -50,13 +50,14 @@ app_license = "mit"
 
 app_include_js = [
     "https://cdn.jsdelivr.net/npm/piopiyjs/dist/piopiy.min.js",
-    "/assets/aabee/js/telecmi.js",
     "/assets/aabee/js/lead.js",
+    # "/assets/aabee/js/navbar.js",
 
 ]
 
 doctype_js = {
-    "Lead": "public/js/lead.js"
+    "Lead": "public/js/lead.js",
+    "Call Log": "public/js/call_log.js",
 }
 
 
